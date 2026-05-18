@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SDExcelClass - Ayuda</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 0; background: #f5f5f5; color: #222; }
+    header { background: #1a5276; color: #fff; padding: 24px 40px 16px; }
+    header h1 { margin: 0 0 4px; font-size: 1.8em; }
+    header p  { margin: 0; font-size: 1em; opacity: 0.85; }
+    nav { background: #1f618d; padding: 0 40px; }
+    nav a { display: inline-block; color: #aed6f1; text-decoration: none; padding: 10px 18px; font-size: 0.9em; }
+    nav a:hover { background: #2980b9; color: #fff; }
+    main { max-width: 960px; margin: 32px auto; background: #fff; padding: 32px 40px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+    h2 { border-bottom: 2px solid #1a5276; padding-bottom: 6px; color: #1a5276; margin-top: 40px; }
+    h3 { color: #1f618d; margin-top: 28px; }
+    code, pre { font-family: Consolas, 'Courier New', monospace; }
+    pre { background: #f0f4f8; border-left: 4px solid #2980b9; padding: 14px 18px; border-radius: 3px; overflow-x: auto; font-size: 0.88em; line-height: 1.6; }
+    table { border-collapse: collapse; width: 100%; margin: 14px 0; }
+    th { background: #1a5276; color: #fff; padding: 8px 14px; text-align: left; font-size: 0.9em; }
+    td { border: 1px solid #dde; padding: 7px 14px; font-size: 0.88em; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f9fb; }
+    .badge { display: inline-block; background: #1a5276; color: #fff; border-radius: 3px; padding: 2px 8px; font-size: 0.78em; margin-left: 6px; vertical-align: middle; }
+    .note { background: #eaf4fb; border-left: 4px solid #2980b9; padding: 10px 16px; border-radius: 3px; margin: 12px 0; font-size: 0.9em; }
+    .warn { background: #fef9e7; border-left: 4px solid #f1c40f; padding: 10px 16px; border-radius: 3px; margin: 12px 0; font-size: 0.9em; }
+    footer { text-align: center; padding: 24px; color: #888; font-size: 0.85em; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>SDExcelClass</h1>
+  <p>Control OLE para generacion de archivos Excel sin Microsoft Excel &mdash; SD Digitales 2026</p>
+</header>
+
+<nav>
+  <a href="#instalacion">Instalacion</a>
+  <a href="#template">Template</a>
+  <a href="#uso">Uso basico</a>
+  <a href="#api">Referencia API</a>
+  <a href="#constantes">Constantes</a>
+  <a href="#deployment">Deployment</a>
+</nav>
+
+<main>
+
+<!-- ============================================================ -->
+<h2 id="descripcion">Descripcion</h2>
+
+<p><strong>SDExcelClass</strong> es un wrapper Clarion que replica la API de <em>MSExcelClass</em> / <em>MSOfficeClass</em> de Softmasters, pero utiliza <strong>SDExcelCtrl</strong> &mdash; un control COM OLE basado en <a href="https://github.com/ClosedXML/ClosedXML">ClosedXML 0.97.0</a> &mdash; en lugar de Microsoft Excel.</p>
+
+<ul>
+  <li>No requiere Microsoft Excel instalado.</li>
+  <li>Genera archivos <code>.xlsx</code> nativos via ClosedXML.</li>
+  <li>Usa OLE estandar de Clarion: <code>Window $ Control{'Metodo(args)'}</code>.</li>
+  <li>No requiere UltimateCOM ni templates de terceros.</li>
+  <li>Compatible con Clarion 11 (x86).</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="instalacion">Instalacion</h2>
+
+<h3>1. Archivos Clarion</h3>
+<p>Copiar a la carpeta <code>LibSrc\Win</code> de Clarion (p.ej. <code>C:\Clarion11\LibSrc\Win\</code>):</p>
+<ul>
+  <li><code>SDExcelClass.inc</code> &mdash; declaracion de la clase</li>
+  <li><code>SDExcelClass.clw</code> &mdash; implementacion</li>
+</ul>
+
+<h3>2. Template</h3>
+<p>Copiar <code>SDExcelClass.tpl</code> a la carpeta de templates de Clarion (p.ej. <code>C:\Clarion11\Template\</code>) y registrar en el IDE via <em>Tools &rarr; Template Registry &rarr; Register</em>.</p>
+
+<h3>3. DLLs de dependencia</h3>
+<p>Copiar los siguientes <strong>18 archivos</strong> al mismo directorio que el <code>.EXE</code> de la aplicacion:</p>
+<pre>SDExcelCtrl.dll
+ClosedXML.dll
+ClosedXML.Parser.dll
+DocumentFormat.OpenXml.dll
+DocumentFormat.OpenXml.Framework.dll
+ExcelNumberFormat.dll
+Irony.dll
+Microsoft.Bcl.HashCode.dll
+RBush.dll
+SixLabors.Fonts.dll
+System.Buffers.dll
+System.Diagnostics.DiagnosticSource.dll
+System.IO.Packaging.dll
+System.Memory.dll
+System.Numerics.Vectors.dll
+System.Runtime.CompilerServices.Unsafe.dll
+System.ValueTuple.dll
+XLParser.dll</pre>
+<p>Origen: <code>SDExcelCtrl\bin\Release\net472\win-x86\</code></p>
+<div class="warn">
+  <strong>Binding redirect requerido:</strong> Cada <code>.EXE</code> de la aplicacion necesita un archivo <code>.exe.config</code> con el siguiente redirect para <code>System.Numerics.Vectors</code>:
+<pre>&lt;configuration&gt;
+  &lt;runtime&gt;
+    &lt;assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1"&gt;
+      &lt;dependentAssembly&gt;
+        &lt;assemblyIdentity name="System.Numerics.Vectors"
+            publicKeyToken="b03f5f7f11d50a3a" culture="neutral"/&gt;
+        &lt;bindingRedirect oldVersion="0.0.0.0-4.1.4.0" newVersion="4.1.4.0"/&gt;
+      &lt;/dependentAssembly&gt;
+    &lt;/assemblyBinding&gt;
+  &lt;/runtime&gt;
+&lt;/configuration&gt;</pre>
+</div>
+
+<div class="warn">
+  <strong>Importante:</strong> El proyecto Clarion debe compilarse como <strong>x86</strong>. SDExcelCtrl.dll es un ensamblado .NET x86 (ClosedXML no soporta Any CPU en este escenario).
+</div>
+
+<!-- ============================================================ -->
+<h2 id="template">Uso del template</h2>
+
+<h3>Extension global (SDExcelGlobal)</h3>
+<p>Agregar la extension <strong>SD Excel Extension Global</strong> en el nodo <em>Global</em> de la aplicacion. Esto:</p>
+<ul>
+  <li>Incluye <code>SDExcelClass.inc</code> automaticamente.</li>
+  <li>Declara la variable global <code>SDExcel SDExcelClass</code>.</li>
+</ul>
+
+<h3>Control OLE en la ventana (SDExcelControl)</h3>
+<p>En la ventana donde se va a usar Excel, agregar el control <strong>SD Excel - SDExcelClass</strong> desde el panel de controles. Esto inserta un control OLE invisible (<code>1x1</code>) y cablea automaticamente las propiedades <code>Window</code> y <code>Control</code> del objeto.</p>
+
+<h3>Codigo de inicializacion (SDExcelInit)</h3>
+<p>En la seccion <code>CODE</code> de la ventana, antes de llamar a cualquier metodo, insertar el embed <strong>SDExcelInit</strong>:</p>
+<pre>CODE
+  SDExcel.Init(SELF,?SDExcel)  ! Activa el control COM</pre>
+
+<div class="note">
+  <strong>Nota:</strong> <code>Init()</code> asigna la ventana y el control, luego llama a <code>Start()</code> que ejecuta <code>PROP:Language</code> y <code>PROP:Create</code> para activar el COM. Debe llamarse despues de que la ventana este abierta.
+</div>
+
+<h3>Codigo de cierre (SDExcelKill)</h3>
+<p>Al cerrar la ventana, insertar el embed <strong>SDExcelKill</strong>:</p>
+<pre>SDExcel.Kill()  ! Desactiva el control COM</pre>
+
+<!-- ============================================================ -->
+<h2 id="uso">Uso basico</h2>
+
+<pre>! Crear un archivo Excel nuevo
+SDExcel.CreateFile()
+
+! Seleccionar celda A1 y escribir un valor
+SDExcel.Select('A1')
+SDExcel.Assign('Hola Mundo')
+
+! Escribir por posicion (fila, columna)
+SDExcel.Assign(2, 1, 'Segunda fila')
+
+! Aplicar formato
+SDExcel.SetNumberFormat('#,##0.00')
+SDExcel.SetHAlignment(SDExcel:Center)
+SDExcel.SetColumnWidth('A', 25)
+
+! Guardar
+SDExcel.Save('C:\Temp\Reporte.xlsx')
+
+! Cerrar el workbook
+SDExcel.Close(0)</pre>
+
+<h3>Trabajo con hojas</h3>
+<pre>! Agregar una segunda hoja
+SDExcel.AddSheet(1)
+
+! Seleccionar hoja por numero (1-based)
+SDExcel.SelectSheet(2)
+
+! Renombrar la hoja activa
+SDExcel.SetSheetName(2, 'Detalle')
+
+! Seleccionar hoja por nombre
+SDExcel.SelectSheetByName('Detalle')</pre>
+
+<h3>Lectura de celdas</h3>
+<pre>MiVariable = SDExcel.Read()            ! Celda seleccionada
+MiVariable = SDExcel.Read('B5')        ! Por rango
+MiVariable = SDExcel.Read(3, 2)        ! Por posicion (fila, columna)</pre>
+
+<!-- ============================================================ -->
+<h2 id="api">Referencia de la API</h2>
+
+<h3>Ciclo de vida</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>Init(WINDOW, SIGNED)</code></td><td>Inicializa la clase y activa el control OLE. Llamar desde SDExcelInit.</td></tr>
+  <tr><td><code>Kill()</code></td><td>Desactiva el control OLE. Llamar desde SDExcelKill.</td></tr>
+  <tr><td><code>About()</code></td><td>Muestra informacion de version del control.</td></tr>
+</table>
+
+<h3>Archivos</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>CreateFile()</code></td><td>Crea un workbook nuevo en memoria.</td></tr>
+  <tr><td><code>CreateFile(STRING FileName)</code></td><td>Crea un workbook nuevo y lo guarda en la ruta indicada.</td></tr>
+  <tr><td><code>OpenFile(STRING FileName)</code></td><td>Abre un archivo <code>.xlsx</code> existente.</td></tr>
+  <tr><td><code>Save(STRING FileName)</code></td><td>Guarda el workbook en la ruta indicada.</td></tr>
+  <tr><td><code>Close(BYTE SaveChanges)</code></td><td>Cierra el workbook. <code>SaveChanges = 1</code> para guardar antes de cerrar.</td></tr>
+</table>
+
+<h3>Seleccion</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>Select(STRING Range)</code></td><td>Selecciona un rango por nombre (ej. <code>'A1:C5'</code>).</td></tr>
+  <tr><td><code>Select(LONG Row, LONG Column)</code></td><td>Selecciona una celda por posicion.</td></tr>
+  <tr><td><code>SelectRow(LONG Row)</code></td><td>Selecciona una fila completa.</td></tr>
+  <tr><td><code>SelectColumn(STRING Column)</code></td><td>Selecciona una columna por letra (ej. <code>'B'</code>).</td></tr>
+  <tr><td><code>SelectColumnByNumber(LONG Column)</code></td><td>Selecciona una columna por numero (1-based).</td></tr>
+</table>
+
+<h3>Escritura</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>Assign(STRING Contents)</code></td><td>Escribe en la celda seleccionada (cursor no se mueve).</td></tr>
+  <tr><td><code>Assign(STRING Range, STRING Contents)</code></td><td>Escribe en el rango indicado y <strong>mueve el cursor</strong> a esa celda.</td></tr>
+  <tr><td><code>Assign(LONG Row, LONG Col, STRING Contents)</code></td><td>Escribe por posicion y <strong>mueve el cursor</strong> a esa celda.</td></tr>
+  <tr><td><code>AssignWithFormat(STRING Contents, STRING Format)</code></td><td>Escribe valor y aplica formato numerico.</td></tr>
+  <tr><td><code>AssignWithFormat(STRING Range, STRING Contents, STRING Format)</code></td><td>Por rango &mdash; <strong>mueve el cursor</strong>.</td></tr>
+  <tr><td><code>AssignWithFormat(LONG Row, LONG Col, STRING Contents, STRING Format)</code></td><td>Por posicion &mdash; <strong>mueve el cursor</strong>.</td></tr>
+</table>
+<div class="note">
+  <strong>Cursor:</strong> Todos los metodos <em>ByRange</em> y <em>ByPos</em> actualizan la posicion activa (<code>_activeRow</code> / <code>_activeColumn</code>). Esto permite llamar a <code>SetFontSize</code>, <code>SetBold</code>, etc. inmediatamente despues de <code>Assign</code> sin necesidad de llamar a <code>Select</code> explicitamente.
+</div>
+
+<h3>Lectura</h3>
+<table>
+  <tr><th>Metodo</th><th>Retorna</th><th>Descripcion</th></tr>
+  <tr><td><code>Read()</code></td><td>STRING</td><td>Lee la celda seleccionada.</td></tr>
+  <tr><td><code>Read(STRING Cell)</code></td><td>STRING</td><td>Lee por rango.</td></tr>
+  <tr><td><code>Read(LONG Row, LONG Col)</code></td><td>STRING</td><td>Lee por posicion.</td></tr>
+</table>
+
+<h3>Formato numerico</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>SetNumberFormat(STRING Format)</code></td><td>Aplica formato a la celda seleccionada.</td></tr>
+  <tr><td><code>SetNumberFormat(STRING Range, STRING Format)</code></td><td>Aplica formato por rango.</td></tr>
+  <tr><td><code>SetNumberFormat(LONG Row, LONG Col, STRING Format)</code></td><td>Aplica formato por posicion.</td></tr>
+</table>
+
+<h3>Alineacion horizontal</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>SetHAlignment(BYTE Alignment)</code></td><td>Alinea la celda seleccionada. Ver constantes SDExcel:Left / Center / Right.</td></tr>
+  <tr><td><code>SetHAlignment(STRING Range, BYTE Alignment)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>SetHAlignment(LONG Row, LONG Col, BYTE Alignment)</code></td><td>Por posicion.</td></tr>
+</table>
+
+<h3>Alineacion vertical</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>SetVAlignment(BYTE Alignment)</code></td><td>Alinea verticalmente la celda seleccionada. Ver SDExcel:VTop / VCenter / VBottom.</td></tr>
+  <tr><td><code>SetVAlignment(STRING Range, BYTE Alignment)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>SetVAlignment(LONG Row, LONG Col, BYTE Alignment)</code></td><td>Por posicion.</td></tr>
+</table>
+
+<h3>Combinar celdas</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>MergeCells()</code></td><td>Combina el rango seleccionado.</td></tr>
+  <tr><td><code>MergeCells(STRING Range)</code></td><td>Combina el rango indicado.</td></tr>
+</table>
+
+<h3>Ajuste de texto</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>SetWrapText(BYTE WrapText)</code></td><td>Activa/desactiva wrap en la celda seleccionada (1=si, 0=no).</td></tr>
+  <tr><td><code>SetWrapText(STRING Range, BYTE WrapText)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>SetWrapText(LONG Row, LONG Col, BYTE WrapText)</code></td><td>Por posicion.</td></tr>
+</table>
+
+<h3>Ancho de columna</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>SetColumnWidth(LONG Width)</code></td><td>Ancho de la columna seleccionada (unidades Excel).</td></tr>
+  <tr><td><code>SetColumnWidth(STRING Column, LONG Width)</code></td><td>Por nombre de columna.</td></tr>
+  <tr><td><code>SetColumnWidthByNumber(LONG Column, LONG Width)</code></td><td>Por numero de columna (1-based).</td></tr>
+</table>
+
+<h3>Alto de fila</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>SetRowHeight(LONG Height)</code></td><td>Alto de la fila seleccionada (unidades Excel).</td></tr>
+  <tr><td><code>SetRowHeight(LONG Row, LONG Height)</code></td><td>Por numero de fila.</td></tr>
+</table>
+
+<h3>Hojas</h3>
+<table>
+  <tr><th>Metodo</th><th>Retorna</th><th>Descripcion</th></tr>
+  <tr><td><code>AddSheet(BYTE Count)</code></td><td>&mdash;</td><td>Agrega <em>Count</em> hojas al workbook.</td></tr>
+  <tr><td><code>SelectSheet(SHORT Sheet)</code></td><td>&mdash;</td><td>Activa la hoja numero <em>Sheet</em> (1-based).</td></tr>
+  <tr><td><code>SelectSheetByName(STRING Name)</code></td><td>&mdash;</td><td>Activa la hoja por nombre.</td></tr>
+  <tr><td><code>GetSheetCount()</code></td><td>SHORT</td><td>Numero total de hojas.</td></tr>
+  <tr><td><code>GetSheetIndex()</code></td><td>LONG</td><td>Indice de la hoja activa.</td></tr>
+  <tr><td><code>GetSheetIndex(STRING Name)</code></td><td>LONG</td><td>Indice de la hoja por nombre.</td></tr>
+  <tr><td><code>GetSheetName()</code></td><td>STRING</td><td>Nombre de la hoja activa.</td></tr>
+  <tr><td><code>GetSheetName(LONG Sheet)</code></td><td>STRING</td><td>Nombre de la hoja por indice.</td></tr>
+  <tr><td><code>SetSheetName(SHORT Sheet, STRING Name)</code></td><td>&mdash;</td><td>Renombra una hoja.</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2 id="constantes">Constantes</h2>
+
+<table>
+  <tr><th>Constante</th><th>Valor</th><th>Uso</th></tr>
+  <tr><td><code>SDExcel:Left</code></td><td>1</td><td>Alineacion horizontal izquierda</td></tr>
+  <tr><td><code>SDExcel:Center</code></td><td>2</td><td>Alineacion horizontal centrada</td></tr>
+  <tr><td><code>SDExcel:Right</code></td><td>3</td><td>Alineacion horizontal derecha</td></tr>
+  <tr><td><code>SDExcel:VTop</code></td><td>1</td><td>Alineacion vertical superior</td></tr>
+  <tr><td><code>SDExcel:VCenter</code></td><td>2</td><td>Alineacion vertical centrada</td></tr>
+  <tr><td><code>SDExcel:VBottom</code></td><td>3</td><td>Alineacion vertical inferior</td></tr>
+  <tr><td><code>SDExcel:StrMax</code></td><td>8192</td><td>Longitud maxima de STRING retornado</td></tr>
+  <tr><td><code>SDExcel:BorderNone</code></td><td>0</td><td>Sin borde</td></tr>
+  <tr><td><code>SDExcel:BorderThin</code></td><td>1</td><td>Borde fino</td></tr>
+  <tr><td><code>SDExcel:BorderMedium</code></td><td>2</td><td>Borde medio</td></tr>
+  <tr><td><code>SDExcel:BorderThick</code></td><td>3</td><td>Borde grueso</td></tr>
+</table>
+
+<h3>Fuente</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>SetBold(BYTE)</code></td><td>Negrita en celda seleccionada (1=si, 0=no).</td></tr>
+  <tr><td><code>SetBoldByRange(STRING, BYTE)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>SetBoldByPos(LONG, LONG, BYTE)</code></td><td>Por posicion.</td></tr>
+  <tr><td><code>SetItalic(BYTE)</code></td><td>Italica en celda seleccionada.</td></tr>
+  <tr><td><code>SetItalicByRange(STRING, BYTE)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>SetItalicByPos(LONG, LONG, BYTE)</code></td><td>Por posicion.</td></tr>
+  <tr><td><code>SetFontSize(LONG)</code></td><td>Tamanio de fuente en puntos.</td></tr>
+  <tr><td><code>SetFontSizeByRange(STRING, LONG)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>SetFontSizeByPos(LONG, LONG, LONG)</code></td><td>Por posicion.</td></tr>
+  <tr><td><code>SetFontName(STRING)</code></td><td>Nombre de fuente (ej. <code>'Arial'</code>).</td></tr>
+  <tr><td><code>SetFontNameByRange(STRING, STRING)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>SetFontNameByPos(LONG, LONG, STRING)</code></td><td>Por posicion.</td></tr>
+  <tr><td><code>SetFontColor(STRING)</code></td><td>Color de texto en formato <code>'#RRGGBB'</code>.</td></tr>
+  <tr><td><code>SetFontColorByRange(STRING, STRING)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>SetFontColorByPos(LONG, LONG, STRING)</code></td><td>Por posicion.</td></tr>
+</table>
+
+<h3>Fondo (Fill)</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>SetBgColor(STRING)</code></td><td>Color de fondo en formato <code>'#RRGGBB'</code>.</td></tr>
+  <tr><td><code>SetBgColorByRange(STRING, STRING)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>SetBgColorByPos(LONG, LONG, STRING)</code></td><td>Por posicion.</td></tr>
+</table>
+
+<h3>Asignacion con formato</h3>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>AssignWithFormat(STRING Contents, STRING Format)</code></td><td>Escribe valor y aplica formato numerico en una llamada.</td></tr>
+  <tr><td><code>AssignWithFormatByRange(STRING, STRING, STRING)</code></td><td>Por rango.</td></tr>
+  <tr><td><code>AssignWithFormatByPos(LONG, LONG, STRING, STRING)</code></td><td>Por posicion.</td></tr>
+</table>
+
+<h3>Bordes</h3>
+<p>Estilo: <code>SDExcel:BorderNone=0</code>, <code>BorderThin=1</code>, <code>BorderMedium=2</code>, <code>BorderThick=3</code></p>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th></tr>
+  <tr><td><code>SetBorder(BYTE)</code></td><td>Los 4 lados de la celda seleccionada.</td></tr>
+  <tr><td><code>SetTopBorder(BYTE)</code></td><td>Solo borde superior — separadores desde arriba.</td></tr>
+  <tr><td><code>SetBottomBorder(BYTE)</code></td><td>Solo borde inferior — subrayados, separadores.</td></tr>
+  <tr><td><code>SetLeftBorder(BYTE)</code></td><td>Solo borde izquierdo.</td></tr>
+  <tr><td><code>SetRightBorder(BYTE)</code></td><td>Solo borde derecho.</td></tr>
+  <tr><td><code>SetBorderByRange(STRING, BYTE)</code></td><td>Todos los bordes del rango (exterior + interior).</td></tr>
+  <tr><td><code>SetOutsideBorderByRange(STRING, BYTE)</code></td><td>Solo borde exterior del rango.</td></tr>
+  <tr><td><code>SetInsideBorderByRange(STRING, BYTE)</code></td><td>Solo bordes interiores del rango.</td></tr>
+  <tr><td><code>SetTopBorderByRange(STRING, BYTE)</code></td><td>Solo borde superior del rango.</td></tr>
+  <tr><td><code>SetBottomBorderByRange(STRING, BYTE)</code></td><td>Solo borde inferior del rango.</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2 id="buildall">Nota crítica: Build All en Clarion</h2>
+
+<div class="warn">
+  <strong>Después de actualizar <code>SDExcelClass.inc</code> o <code>SDExcelClass.clw</code>, siempre usar Build &rarr; Build All (recompilación completa) en el IDE Clarion &mdash; nunca Build incremental.</strong>
+  <p style="margin:8px 0 0">
+  Clarion mantiene la VMT (Virtual Method Table) de la clase por módulo compilado. Si se agrega, elimina o reordena cualquier método en el INC y el proyecto se compila de forma incremental, los módulos que llaman a SDExcel quedan con una VMT desactualizada. El resultado es un GPF en tiempo de ejecución: las llamadas a métodos aterrizan en la función equivocada, con parámetros del stack que no corresponden al método invocado.
+  </p>
+  <p style="margin:6px 0 0"><strong>Regla:</strong> cambio en INC/CLW &rarr; <code>ConvertToAnsi.ps1</code> &rarr; <strong>Build All</strong> en cada app que use SDExcelClass.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="deployment">Deployment</h2>
+
+<p>Para distribuir una aplicacion que usa SDExcelClass:</p>
+<ol>
+  <li>Incluir los <strong>18 DLLs</strong> listados en la seccion Instalacion junto al <code>.EXE</code>.</li>
+  <li>Crear un <code>.exe.config</code> para cada EXE con el binding redirect de <code>System.Numerics.Vectors</code> (ver seccion Instalacion).</li>
+  <li>El control usa COM sin registro (<em>Registration-Free COM</em>) via manifest embebido en <code>SDExcelCtrl.dll</code>. <strong>No es necesario ejecutar regasm ni tener permisos de administrador</strong>.</li>
+  <li>El proyecto Clarion debe compilarse para <strong>x86</strong>.</li>
+  <li>No se requiere .NET Framework adicional: el runtime es <code>net472</code> (incluido en Windows 10/11).</li>
+</ol>
+
+<div class="note">
+  <strong>CLSID:</strong> <code>{5F468519-2E4D-43FA-BD6B-77FD7861D0E1}</code><br>
+  <strong>ProgID:</strong> <code>SDExcelCtrl.SDExcelCtrl</code>
+</div>
+
+</main>
+
+<footer>
+  SDExcelClass &mdash; SD Digitales 2026 &mdash; Licencia MIT
+</footer>
+
+</body>
+</html>
