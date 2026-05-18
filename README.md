@@ -259,4 +259,9 @@ MIT — ver [LICENSE](LICENSE).
 
 ---
 
+## Donaciones
+Si esta extensión te es de utilidad, puede dejar una pequeña contribución en mi cuenta de PayPal informacion@sdigitales.com.ar
+
+---
+
 *SD Digitales — 2026*
