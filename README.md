@@ -259,8 +259,11 @@ MIT — ver [LICENSE](LICENSE).
 
 ---
 
-## Donaciones
-Si esta extensión te es de utilidad, puede dejar una pequeña contribución en mi cuenta de PayPal informacion@sdigitales.com.ar
+## ☕ ¿Te fue útil?
+
+Si esta herramienta te ahorró tiempo, podés invitarme un café:
+
+[![Donar con PayPal](https://www.paypalobjects.com/es_ES/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate/?business=informacion@sdigitales.com.ar)
 
 ---
 
